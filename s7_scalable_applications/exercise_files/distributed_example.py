@@ -64,20 +64,20 @@ def main():
     )
 
     # start your training!
-    for epoch in range(NUM_EPOCHS):
+    for _ in range(NUM_EPOCHS):
         # put model in train mode
         model.train()
 
         # let all processes sync up before starting with a new epoch of training
         dist.barrier()
 
-        for step, batch in enumerate(dataloader):
+        for batch in dataloader:
             # send batch to device
             batch = tuple(t.to(args.device) for t in batch)
-            
+
             # forward pass
             outputs = model(*batch)
-            
+
             # compute loss
             loss = outputs[0]
 
