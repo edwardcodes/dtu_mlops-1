@@ -32,17 +32,17 @@ if __name__ == '__main__':
     parser.add_argument('-visualize_batch', action='store_true')
     parser.add_argument('-get_timing', action='store_true')
     parser.add_argument('-batches_to_check', default=100, type=int)
-    
+
     args = parser.parse_args()
-    
+
     lfw_trans = transforms.Compose([
         transforms.RandomAffine(5, (0.1, 0.1), (0.5, 2.0)),
         transforms.ToTensor()
     ])
-    
+
     # Define dataset
     dataset = LFWDataset(args.path_to_folder, lfw_trans)
-    
+
     # Define dataloader
     dataloader = DataLoader(
         dataset, 
@@ -50,11 +50,7 @@ if __name__ == '__main__':
         shuffle=False,
         num_workers=args.num_workers
     )
-    
-    if args.visualize_batch:
-        # TODO: visualize a batch of images
-        pass
-        
+
     if args.get_timing:
         # lets do some repetitions
         res = [ ]
@@ -66,6 +62,6 @@ if __name__ == '__main__':
             end = time.time()
 
             res.append(end - start)
-            
+
         res = np.array(res)
         print('Timing: {np.mean(res)}+-{np.std(res)}')

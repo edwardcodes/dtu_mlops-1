@@ -53,10 +53,8 @@ class Encoder(nn.Module):
        
     def reparameterization(self, mean, std,):
         epsilon = torch.randn_like(std)
-        
-        z = mean + std*epsilon
-        
-        return z
+
+        return mean + std*epsilon
     
 class Decoder(nn.Module):
     def __init__(self, latent_dim, hidden_dim, output_dim):
@@ -66,8 +64,7 @@ class Decoder(nn.Module):
         
     def forward(self, x):
         h     = torch.relu(self.FC_hidden(x))
-        x_hat = torch.sigmoid(self.FC_output(h))
-        return x_hat
+        return torch.sigmoid(self.FC_output(h))
     
     
 class Model(nn.Module):
@@ -112,21 +109,21 @@ for epoch in range(epochs):
 
         x_hat, mean, log_var = model(x)
         loss = loss_function(x, x_hat, mean, log_var)
-        
+
         overall_loss += loss.item()
-        
+
         loss.backward()
         optimizer.step()
-    print("\tEpoch", epoch + 1, "complete!", "\tAverage Loss: ", overall_loss / (batch_idx*batch_size))    
+    print("\tEpoch", epoch + 1, "complete!", "\tAverage Loss: ", overall_loss / (batch_idx*batch_size))
 print("Finish!!")
 
 # Generate reconstructions
 model.eval()
 with torch.no_grad():
-    for batch_idx, (x, _) in enumerate(test_loader):
+    for x, _ in test_loader:
         x = x.view(batch_size, x_dim)
-        x = x.to(DEVICE)      
-        x_hat, _, _ = model(x)       
+        x = x.to(DEVICE)
+        x_hat, _, _ = model(x)
         break
 
 save_image(x.view(batch_size, 1, 28, 28), 'orig_data.png')
@@ -136,5 +133,5 @@ save_image(x_hat.view(batch_size, 1, 28, 28), 'reconstructions.png')
 with torch.no_grad():
     noise = torch.randn(batch_size, latent_dim).to(DEVICE)
     generated_images = decoder(noise)
-    
+
 save_image(generated_images.view(batch_size, 1, 28, 28), 'generated_sample.png')
